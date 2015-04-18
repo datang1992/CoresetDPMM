@@ -5,21 +5,21 @@
 #include <vector>
 #include <math.h>
 #include <gsl/gsl_randist.h>
-#include <gsl/gsl_matrix.h>
+#include <eigen3/Eigen/Dense>
 
 using namespace std;
 
 
 class SVA_model {
 	public:
-		int K,  N;
-		int dim;
+		const int K,  N;
+		const int dim;
 		vector<double> y;
-		vector<gsl_matirx*> x;
+		vector<MatrixXd> x;
 		vector<int> z;
 		vectore<double> zeta;
 		vector<int> Num;
-		vector<gsl_matrix*> eta;
+		vector<MatrixXd> eta;
 		
 		int initial_cluster_number;
 		
