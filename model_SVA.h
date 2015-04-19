@@ -20,7 +20,11 @@ class SVA_model {
 		vector<double> zeta;
 		vector<int> Num;
 		vector<MatrixXd> eta;
-		
+
+		vector<int> thread_assignment;
+		vectot<int> origin_number;
+		vector<SVA_model*> sub_models;
+
 		int initial_cluster_number;
 		
 		int Nthreads;
