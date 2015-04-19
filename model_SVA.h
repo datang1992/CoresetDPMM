@@ -22,7 +22,7 @@ class SVA_model {
 		vector<MatrixXd> eta;
 
 		vector<int> thread_assignment;
-		vectot<int> origin_number;
+		vector<int> origin_number;
 		vector<SVA_model*> sub_models;
 
 		int initial_cluster_number;
@@ -41,8 +41,14 @@ class SVA_model {
 
 
 		void initialize();
+		void find_bacteria_solution();
+		void compute_coreset();
+		void collect_coreset();
+		void M2DPM();
+		void map_back();
+		void cross_validiction();
 		
-		SVA_model();
+		SVA_model(int, int, int, double, double, double, double);
 		~SVA_model();
 };
 
