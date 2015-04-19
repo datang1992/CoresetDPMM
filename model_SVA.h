@@ -8,7 +8,7 @@
 #include <eigen3/Eigen/Dense>
 
 using namespace std;
-
+using namespace Eigen;
 
 class SVA_model {
 	public:
@@ -17,7 +17,7 @@ class SVA_model {
 		vector<double> y;
 		vector<MatrixXd> x;
 		vector<int> z;
-		vectore<double> zeta;
+		vector<double> zeta;
 		vector<int> Num;
 		vector<MatrixXd> eta;
 		
