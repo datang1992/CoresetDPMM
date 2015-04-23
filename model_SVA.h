@@ -36,8 +36,13 @@ class SVA_model {
 		const double C, l, nu;
 		const double alpha;
 
+		const double lambda; //DP Means parameter
+
 		long rand_seed;
 		gsl_rng *rng;
+
+		vector<MatrixXd> bac_sol;
+		vector<MatrixXd> coreset;
 
 
 		void initialize();
@@ -48,7 +53,7 @@ class SVA_model {
 		void map_back();
 		void cross_validiction();
 		
-		SVA_model(int, int, int, double, double, double, double);
+		SVA_model(int, int, int, double, double, double, double, double);
 		~SVA_model();
 };
 
