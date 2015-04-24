@@ -20,7 +20,9 @@ void SVA_model::initialize() {
 
 void SVA_model::find_bacteria_solution() {
 	//DP Means++ & SVM
-	
+	/*
+	   DP Means++
+	 */
 }
 
 void SVA_model::compute_coreset() {
