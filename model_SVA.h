@@ -41,9 +41,9 @@ class SVA_model {
 		long rand_seed;
 		gsl_rng *rng;
 
-		vector<MatrixXd> bac_sol;
-		vector<MatrixXd> coreset;
-
+		vector<int> bac_sol;
+		vector<int> coreset;
+		vector<double> coreset_weight;
 
 		void initialize();
 		void find_bacteria_solution();

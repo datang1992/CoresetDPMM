@@ -1,5 +1,6 @@
 #include "model_SVA.h"
-#include "time.h"
+#include <time.h>
+#include <iostream>
 
 using namespace std;
 using namespace Eigen;
@@ -23,6 +24,16 @@ void SVA_model::find_bacteria_solution() {
 	/*
 	   DP Means++
 	 */
+	bac_sol.clear();
+	double *P = new double[N];
+	for (int i = 0; i < N; i++)
+		P[i] = 1.0 / N;
+	gsl_ran_discrete_t *grd;
+	grd = gsl_ran_discrete_preproc(N, P);
+	int num_first = gsl_ran_discrete(rng, grd);
+	bac_sol.push_back(num_first);
+	gsl_ran_discrete_free(grd);
+	delete[] P;
 }
 
 void SVA_model::compute_coreset() {
