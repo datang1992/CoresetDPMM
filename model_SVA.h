@@ -15,11 +15,11 @@ class SVA_model {
 		const int K,  N;
 		const int dim;
 		vector<double> y;
-		vector<MatrixXd> x;
+		vector<VectorXd> x;
 		vector<int> z;
 		vector<double> zeta;
 		vector<int> Num;
-		vector<MatrixXd> eta;
+		vector<VectorXd> eta;
 
 		vector<int> thread_assignment;
 		vector<int> origin_number;

@@ -9,7 +9,7 @@ using namespace std;
 using namespace Eigen;
 
 
-double dp_means_dis(vector<MatrixXd>&, vector<MatrixXd>&);
+double dp_means_dis(vector<VectorXd>&, vector<VectorXd>&);
 
 
 #endif
