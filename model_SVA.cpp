@@ -1,4 +1,5 @@
 #include "model_SVA.h"
+#include "utilities.h"
 #include <time.h>
 #include <iostream>
 
@@ -32,8 +33,12 @@ void SVA_model::find_bacteria_solution() {
 	grd = gsl_ran_discrete_preproc(N, P);
 	int num_first = gsl_ran_discrete(rng, grd);
 	bac_sol.push_back(num_first);
+	vector<VectorXd> bac_sol_point;
+	bac_sol_point.push_back(x[num_first]);
 	gsl_ran_discrete_free(grd);
+	while (dp_means_dis(x, bac_sol_point) > 16 * lambda * bac_sol.size() * (log(bac_sol.size()) / log(2) + 2)) {
 	
+	}
 	delete[] P;
 }
 
