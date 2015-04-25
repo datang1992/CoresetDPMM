@@ -33,6 +33,7 @@ void SVA_model::find_bacteria_solution() {
 	int num_first = gsl_ran_discrete(rng, grd);
 	bac_sol.push_back(num_first);
 	gsl_ran_discrete_free(grd);
+	
 	delete[] P;
 }
 

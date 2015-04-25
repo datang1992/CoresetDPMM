@@ -41,6 +41,8 @@ class SVA_model {
 		long rand_seed;
 		gsl_rng *rng;
 
+		static const double PI = 3.14159265358979323846264338327950288;
+
 		vector<int> bac_sol;
 		vector<int> coreset;
 		vector<double> coreset_weight;
