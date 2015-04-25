@@ -1,5 +1,10 @@
+
+
 #include "model_SVA.h"
 #include "utilities.h"
+
+#include "svm.h" //Using LibSVM. Copyright (c) 2000-2014 Chih-Chung Chang and Chih-Jen Lin. 
+
 #include <time.h>
 #include <iostream>
 
@@ -60,7 +65,7 @@ void SVA_model::find_bacteria_solution() {
 }
 
 void SVA_model::compute_coreset() {
-
+	
 }
 
 void SVA_model::M2DPM() {
