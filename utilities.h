@@ -9,7 +9,7 @@ using namespace std;
 using namespace Eigen;
 
 
-double dp_means_dis(vector<VectorXd>&, vector<VectorXd>&);
+void cal_dp_means_dis(vector<VectorXd>&, vector<VectorXd>&, double&, int*, double*);
 
 
 #endif

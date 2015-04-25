@@ -13,7 +13,7 @@ using namespace Eigen;
 class SVA_model {
 	public:
 		const int K,  N;
-		const int dim;
+		const int dim; 
 		vector<double> y;
 		vector<VectorXd> x;
 		vector<int> z;
@@ -42,6 +42,7 @@ class SVA_model {
 		gsl_rng *rng;
 
 		static const double PI = 3.14159265358979323846264338327950288;
+		static const double epsilon = 1e-6;
 
 		vector<int> bac_sol;
 		vector<int> coreset;
