@@ -3,7 +3,7 @@
 #include "model_SVA.h"
 #include "utilities.h"
 
-#include "svm.h" //Using LibSVM. Copyright (c) 2000-2014 Chih-Chung Chang and Chih-Jen Lin. 
+#include "svm.h" //Using LibSVM. Copyright (c) 2000-2014 Chih-Chung Chang and Chih-Jen Lin. All rights reserved.
 
 #include <time.h>
 #include <iostream>
