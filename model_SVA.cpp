@@ -46,16 +46,18 @@ void SVA_model::find_bacteria_solution() {
 	double dis = 0;
 	int *assign = new int[N];
 	cal_dp_means_dis(x, bac_sol_point, dis, assign, distance);
-	while (bac_sol.size() < (unsigned int)N && dis > 16 * lambda * bac_sol.size() * (log(bac_sol.size()) / log(2) + 2)) {
+	while (bac_sol.size() < (unsigned int) N && dis > 16 * lambda * bac_sol.size() * (log(bac_sol.size()) / log(2) + 2)) {
 		for (int i = 0; i < N; i++)
-			distance[i] += epsilon;
+			distance[i] = epsilon;
 		grd = gsl_ran_discrete_preproc(N, distance);
 		do {
 			num_first = gsl_ran_discrete(rng, grd);
-		}while (!mark[num_first]);
+		}while (mark[num_first]);
 		mark[num_first] = true;
 		bac_sol.push_back(num_first);
 		bac_sol_point.push_back(x[num_first]);
+		if (bac_sol.size() % 10 == 0)
+			cout << "Having adding " << bac_sol.size() << "points into the bacteria solution set!" << endl;
 		cal_dp_means_dis(x, bac_sol_point, dis, assign, distance);
 	}
 	for (int i = 0; i < N; i++)
@@ -63,9 +65,10 @@ void SVA_model::find_bacteria_solution() {
 	delete[] assign;
 	delete[] distance;
 	delete[] mark;
+	cout << "Finish DP Means++! We got " << bac_sol.size() << " centers in the bacteria solution!" << endl;
 	// SVM, using subgradient optimization
 	bac_sol_classifier.clear();
-	for (int i = 0; (unsigned int)i < bac_sol.size(); i++) {
+	for (int i = 0; (unsigned int) i < bac_sol.size(); i++) {
 		VectorXd temp = MatrixXd::Zero(dim, 1);
 		bac_sol_classifier.push_back(temp);
 	}
@@ -76,9 +79,10 @@ void SVA_model::find_bacteria_solution() {
 		for (int i = 0; (unsigned int) i < bac_sol.size(); i++)
 			bac_sol_classifier[i] -= SVM_learning_rate * temp_classifier[i]; // Subgradient Update
 		for (int i = 0; i < N; i++)
-			if (l - y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]) > 0)
-				bac_sol_classifier[i] += 2 * nu * nu * C * SVM_learning_rate * y[i] * x[i];	// Subgradient Update			
+			if (l - y[i] * temp_classifier[bac_sol_assign[i]].dot(x[i]) > 0)
+				bac_sol_classifier[bac_sol_assign[i]] += 2 * nu * nu * C * SVM_learning_rate * y[i] * x[i];	// Subgradient Update			
 	}
+	cout << "Finish SVM!" << endl;
 }
 
 void SVA_model::compute_coreset() {
