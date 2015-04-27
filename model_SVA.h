@@ -33,7 +33,7 @@ class SVA_model {
 		
 		vector<double> omega;
 
-		const double C, S, nu;
+		const double C, l, S, nu;
 		const double alpha;
 
 		const double lambda; //DP Means parameter
@@ -63,7 +63,7 @@ class SVA_model {
 		void map_back();
 		void cross_validiction();
 		
-		SVA_model(int, int, int, double, double, double, double, double, double, int, double);
+		SVA_model(int, int, int, double, double, double, double, double, double, double, int, double);
 		~SVA_model();
 };
 

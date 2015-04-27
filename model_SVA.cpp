@@ -9,7 +9,7 @@
 using namespace std;
 using namespace Eigen;
 
-SVA_model::SVA_model(int K, int N, int dim, double C, double S, double nu, double alpha, double lambda, double SVM_learning_rate, int SVM_iterations, double coreset_epsilon): K(K), N(N), dim(dim), C(C), S(S), nu(nu), alpha(alpha), lambda(lambda), SVM_learning_rate(SVM_learning_rate), SVM_iterations(SVM_iterations), coreset_epsilon(coreset_epsilon) {
+SVA_model::SVA_model(int K, int N, int dim, double C, double l, double S, double nu, double alpha, double lambda, double SVM_learning_rate, int SVM_iterations, double coreset_epsilon): K(K), N(N), dim(dim), C(C), l(l), S(S), nu(nu), alpha(alpha), lambda(lambda), SVM_learning_rate(SVM_learning_rate), SVM_iterations(SVM_iterations), coreset_epsilon(coreset_epsilon) {
 	rng = gsl_rng_alloc(gsl_rng_rand48);
 	long seed = clock();
 	gsl_rng_set(rng, seed);
@@ -76,7 +76,7 @@ void SVA_model::find_bacteria_solution() {
 		for (int i = 0; (unsigned int) i < bac_sol.size(); i++)
 			bac_sol_classifier[i] -= SVM_learning_rate * temp_classifier[i]; // Subgradient Update
 		for (int i = 0; i < N; i++)
-			if (1 - y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]) > 0)
+			if (l - y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]) > 0)
 				bac_sol_classifier[i] += 2 * nu * nu * C * SVM_learning_rate * y[i] * x[i];	// Subgradient Update			
 	}
 }
@@ -91,21 +91,21 @@ void SVA_model::compute_coreset() {
 	for (int i = 0; (unsigned int) i < bac_sol.size(); i++) {
 		num_point[bac_sol_assign[i]]++;
 		dis_square_sum[bac_sol_assign[i]] += 2 * S * (x[i] - x[bac_sol[bac_sol_assign[i]]]).dot(x[i] - x[bac_sol[bac_sol_assign[i]]]);
-		if (y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]) > 1)
-			dis_square_sum[bac_sol_assign[i]] += C * (y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]) - 1);
+		if (y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]) > l)
+			dis_square_sum[bac_sol_assign[i]] += C * (y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]) - l);
 	}
 	double Loss = lambda * K;
 	for (int i = 0; (unsigned int) i < bac_sol.size(); i++)
 		Loss += bac_sol_classifier[i].dot(bac_sol_classifier[i]) / (2 * nu * nu);
 	for (int i = 0; i < N; i++)
-		if (1 - y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]) > 0)
-			Loss += 2 * C * (1 - y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]));
+		if (l - y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]) > 0)
+			Loss += 2 * C * (l - y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]));
 	for (int i = 0; i < N; i++)
 		Loss += S * (x[i] - x[bac_sol[bac_sol_assign[i]]]).dot(x[bac_sol[bac_sol_assign[i]]]);
 	for (int i = 0; i < N; i++) {
 		s[i] = 1 + 2 * alpha * N * S * (x[i] - x[bac_sol[bac_sol_assign[i]]]).dot(x[i] - x[bac_sol[bac_sol_assign[i]]]) / Loss;
-		if (1 - y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]) > 0)
-			s[i] += 2 * alpha * N * C * (1 - y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i])) / Loss;
+		if (l - y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]) > 0)
+			s[i] += 2 * alpha * N * C * (l - y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i])) / Loss;
 		s[i] += 2 * alpha * N * dis_square_sum[bac_sol_assign[i]] / (num_point[bac_sol_assign[i]] * Loss);
 		s[i] += 4 * N / num_point[bac_sol_assign[i]];
 	}
@@ -141,7 +141,7 @@ void SVA_model::compute_coreset() {
 }
 
 void SVA_model::M2DPM() {
-
+	
 }
 
 void SVA_model::map_back() {
