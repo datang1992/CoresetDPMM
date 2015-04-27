@@ -12,7 +12,8 @@ using namespace Eigen;
 
 class SVA_model {
 	public:
-		const int K,  N;
+		const double K;
+		const int N;
 		const int dim; 
 		vector<double> y;
 		vector<VectorXd> x;
@@ -33,7 +34,6 @@ class SVA_model {
 		vector<double> omega;
 
 		const double C, l, S, nu, nu2;
-		const double alpha;
 
 		const double lambda; //DP Means parameter
 		
@@ -66,7 +66,7 @@ class SVA_model {
 		double cross_validation(int);
 		double validation();
 		
-		SVA_model(int, int, int, double, double, double, double, double, double, double, double, int, double);
+		SVA_model(double, int, int, double, double, double, double, double, double, double, int, double, int, int);
 		~SVA_model();
 };
 

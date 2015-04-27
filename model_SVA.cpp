@@ -9,7 +9,7 @@
 using namespace std;
 using namespace Eigen;
 
-SVA_model::SVA_model(int K, int N, int dim, double C, double l, double S, double nu, double nu2, double alpha, double lambda, double SVM_learning_rate, int SVM_iterations, double coreset_epsilon): K(K), N(N), dim(dim), C(C), l(l), S(S), nu(nu), nu2(nu2), alpha(alpha), lambda(lambda), SVM_learning_rate(SVM_learning_rate), SVM_iterations(SVM_iterations), coreset_epsilon(coreset_epsilon) {
+SVA_model::SVA_model(double K, int N, int dim, double C, double l, double S, double nu, double nu2, double lambda, double SVM_learning_rate, int SVM_iterations, double coreset_epsilon, int initial_cluster_number, int number_of_iterations): K(K), N(N), dim(dim), C(C), l(l), S(S), nu(nu), nu2(nu2),  lambda(lambda), SVM_learning_rate(SVM_learning_rate), SVM_iterations(SVM_iterations), coreset_epsilon(coreset_epsilon) {
 	rng = gsl_rng_alloc(gsl_rng_rand48);
 	long seed = clock();
 	gsl_rng_set(rng, seed);
@@ -138,6 +138,10 @@ void SVA_model::compute_coreset() {
 	delete[] dis_square_sum;
 	delete[] num_point;
 	delete[] s;
+}
+
+void SVA_model::collect_coreset() {
+
 }
 
 void SVA_model::M2DPM() {
