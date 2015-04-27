@@ -62,6 +62,7 @@ void SVA_model::find_bacteria_solution() {
 	delete[] assign;
 	delete[] distance;
 	delete[] mark;
+	// SVM, using subgradient optimization
 	bac_sol_classifier.clear();
 	for (int i = 0; (unsigned int)i < bac_sol.size(); i++) {
 		VectorXd temp = MatrixXd::Zero(dim, 1);
@@ -72,10 +73,10 @@ void SVA_model::find_bacteria_solution() {
 		for (int i = 0; (unsigned int) i < bac_sol.size(); i++)
 			temp_classifier.push_back(bac_sol_classifier[i]);
 		for (int i = 0; (unsigned int) i < bac_sol.size(); i++)
-			bac_sol_classifier[i] -= SVM_learning_rate * temp_classifier[i];
+			bac_sol_classifier[i] -= SVM_learning_rate * temp_classifier[i]; // Subgradient Update
 		for (int i = 0; i < N; i++)
 			if (1 - y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]) > 0)
-				bac_sol_classifier[i] += SVM_learning_rate * y[i] * x[i];					
+				bac_sol_classifier[i] += 2 * nu * nu * C * SVM_learning_rate * y[i] * x[i];	// Subgradient Update			
 	}
 }
 
