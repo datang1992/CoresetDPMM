@@ -11,5 +11,6 @@ using namespace Eigen;
 
 void cal_dp_means_dis(vector<VectorXd>&, vector<VectorXd>&, double&, int*, double*);
 
+double hinge_plus(double);
 
 #endif

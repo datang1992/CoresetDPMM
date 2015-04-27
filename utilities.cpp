@@ -19,3 +19,9 @@ void cal_dp_means_dis(vector<VectorXd> &p, vector<VectorXd> &q, double &dis, int
 		dis += distance[i];
 	}
 }
+
+double hinge_plus(double x) {
+	if (x > 0)
+		return x;
+	return 0;
+}

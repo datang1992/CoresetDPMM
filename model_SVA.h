@@ -17,8 +17,7 @@ class SVA_model {
 		vector<double> y;
 		vector<VectorXd> x;
 		vector<int> z;
-		vector<double> zeta;
-		vector<int> Num;
+		vector<VectorXd> mu;
 		vector<VectorXd> eta;
 
 		vector<int> thread_assignment;
@@ -33,7 +32,7 @@ class SVA_model {
 		
 		vector<double> omega;
 
-		const double C, l, S, nu;
+		const double C, l, S, nu, nu2;
 		const double alpha;
 
 		const double lambda; //DP Means parameter
@@ -63,7 +62,7 @@ class SVA_model {
 		void map_back();
 		void cross_validiction();
 		
-		SVA_model(int, int, int, double, double, double, double, double, double, double, int, double);
+		SVA_model(int, int, int, double, double, double, double, double, double, double, double, int, double);
 		~SVA_model();
 };
 
