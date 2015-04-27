@@ -246,8 +246,32 @@ void SVA_model::map_back() {
 
 }
 
-void SVA_model::cross_validiction() {
-
+void SVA_model::compute_assignment() {
+	z.clear();
+	predicted_y.clear();
+	for (int i = 0; i < N; i++) {
+		double min_loss = 1e100;
+		z.push_back(0);
+		for (int j = 0; (unsigned int) j < mu.size(); j++)
+			if (2 * C * hinge_plus(l - y[i] * eta[j].dot(x[i])) + S * (x[i] - mu[j]).dot(x[i] - mu[j]) < min_loss) {
+				min_loss = 2 * C * hinge_plus(l - y[i] * eta[j].dot(x[i])) + S * (x[i] - mu[j]).dot(x[i] - mu[j]);
+				z[i] = j;
+			}
+		if (eta[i].dot(x[i]) > 0)
+			predicted_y.push_back(1);
+		else
+			predicted_y.push_back(-1);
+	}
 }
 
+double SVA_model::cross_validation(int num_fold) {
+	return 0;
+}
 
+double SVA_model::validation() {
+	double acc = 0;
+	for (int i = 0; i < N; i++)
+		if (y[i] * predicted_y[i] > 0)
+			acc += 1.0 / N;
+	return acc;
+}
