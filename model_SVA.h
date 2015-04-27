@@ -33,14 +33,15 @@ class SVA_model {
 		
 		vector<double> omega;
 
-		const double C, l, nu;
+		const double C, S, nu;
 		const double alpha;
 
 		const double lambda; //DP Means parameter
 		
 		const double SVM_learning_rate; //For SVM;
 		const int SVM_iterations; //For SVM;
-
+		
+		const double coreset_epsilon; // Coreset Error Bound
 
 		long rand_seed;
 		gsl_rng *rng;
@@ -62,7 +63,7 @@ class SVA_model {
 		void map_back();
 		void cross_validiction();
 		
-		SVA_model(int, int, int, double, double, double, double, double, double, int);
+		SVA_model(int, int, int, double, double, double, double, double, double, int, double);
 		~SVA_model();
 };
 
