@@ -37,6 +37,10 @@ class SVA_model {
 		const double alpha;
 
 		const double lambda; //DP Means parameter
+		
+		const double SVM_learning_rate; //For SVM;
+		const int SVM_iterations; //For SVM;
+
 
 		long rand_seed;
 		gsl_rng *rng;
@@ -45,6 +49,8 @@ class SVA_model {
 		static const double epsilon = 1e-6;
 
 		vector<int> bac_sol;
+		vector<int> bac_sol_assign;
+		vector<VectorXd> bac_sol_classifier;
 		vector<int> coreset;
 		vector<double> coreset_weight;
 
@@ -56,7 +62,7 @@ class SVA_model {
 		void map_back();
 		void cross_validiction();
 		
-		SVA_model(int, int, int, double, double, double, double, double);
+		SVA_model(int, int, int, double, double, double, double, double, double, int);
 		~SVA_model();
 };
 
