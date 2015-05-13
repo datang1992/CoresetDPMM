@@ -25,12 +25,6 @@ class SVA_model {
 		vector<int> origin_number;
 		vector<SVA_model*> sub_models;
 
-		int initial_cluster_number;
-		
-		int Nthreads;
-
-		int number_of_iterations;
-		
 		vector<double> omega;
 
 		const double C, l, S, nu, nu2;
@@ -41,6 +35,12 @@ class SVA_model {
 		const int SVM_iterations; //For SVM;
 		
 		const double coreset_epsilon; // Coreset Error Bound
+
+		int initial_cluster_number;
+
+		int number_of_iterations;
+
+		int Nthreads;
 
 		long rand_seed;
 		gsl_rng *rng;

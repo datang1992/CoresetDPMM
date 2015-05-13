@@ -35,6 +35,8 @@ int main () {
 	cout << "Finish computing the coreset!" << endl;
 	model.M2DPM();
 	cout << "Finish the M2DPM algorithm!" << endl;
+	model.compute_assignment();
+	cout << "Finish computing the assignments!" << endl;
 	cout << "Accuracy: " << setiosflags(ios::fixed) << setprecision(2) << 100 * model.validation() << "%." << endl;
 	return 0;
 }
