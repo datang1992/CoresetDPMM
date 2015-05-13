@@ -46,7 +46,7 @@ void SVA_model::find_bacteria_solution() {
 	double dis = 0;
 	int *assign = new int[N];
 	cal_dp_means_dis(x, bac_sol_point, dis, assign, distance);
-	while (bac_sol.size() < (unsigned int) N && dis > 16 * lambda * bac_sol.size() * (log(bac_sol.size()) / log(2) + 2)) {
+	while (bac_sol.size() < (unsigned int) N && dis > 16 * lambda * bac_sol.size() * (log(bac_sol.size() + epsilon) / log(2) + 2)) {
 		for (int i = 0; i < N; i++)
 			distance[i] = epsilon;
 		grd = gsl_ran_discrete_preproc(N, distance);
@@ -92,7 +92,7 @@ void SVA_model::compute_coreset() {
 	int *num_point = new int[bac_sol.size()];
 	memset(dis_square_sum, 0, sizeof(double) * bac_sol.size());
 	memset(num_point, 0, sizeof(int) * bac_sol.size());
-	for (int i = 0; (unsigned int) i < bac_sol.size(); i++) {
+	for (int i = 0; i < N; i++) {
 		num_point[bac_sol_assign[i]]++;
 		dis_square_sum[bac_sol_assign[i]] += 2 * S * (x[i] - x[bac_sol[bac_sol_assign[i]]]).dot(x[i] - x[bac_sol[bac_sol_assign[i]]]);
 		if (y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]) > l)
@@ -105,7 +105,7 @@ void SVA_model::compute_coreset() {
 		if (l - y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]) > 0)
 			Loss += 2 * C * (l - y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]));
 	for (int i = 0; i < N; i++)
-		Loss += S * (x[i] - x[bac_sol[bac_sol_assign[i]]]).dot(x[bac_sol[bac_sol_assign[i]]]);
+		Loss += S * (x[i] - x[bac_sol[bac_sol_assign[i]]]).dot(x[i] - x[bac_sol[bac_sol_assign[i]]]);
 	for (int i = 0; i < N; i++) {
 		s[i] = 1 + 2 * alpha * N * S * (x[i] - x[bac_sol[bac_sol_assign[i]]]).dot(x[i] - x[bac_sol[bac_sol_assign[i]]]) / Loss;
 		if (l - y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]) > 0)
@@ -113,7 +113,7 @@ void SVA_model::compute_coreset() {
 		s[i] += 2 * alpha * N * dis_square_sum[bac_sol_assign[i]] / (num_point[bac_sol_assign[i]] * Loss);
 		s[i] += 4 * N / num_point[bac_sol_assign[i]];
 	}
-	int coreset_point_num = 10 * dim * bac_sol.size() * bac_sol.size() * bac_sol.size() * log(bac_sol.size()) / (coreset_epsilon * coreset_epsilon);
+	int coreset_point_num = min(int(2 * dim * bac_sol.size() * bac_sol.size() * bac_sol.size() * log(bac_sol.size()) / (coreset_epsilon * coreset_epsilon)), N / 10);
 	
 	double sum_s = 0;
 	for (int i = 0; i < N; i++)
