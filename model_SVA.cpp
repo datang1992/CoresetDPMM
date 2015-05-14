@@ -57,7 +57,7 @@ void SVA_model::find_bacteria_solution() {
 		bac_sol.push_back(num_first);
 		bac_sol_point.push_back(x[num_first]);
 		if (bac_sol.size() % 10 == 0)
-			cout << "Having adding " << bac_sol.size() << "points into the bacteria solution set!" << endl;
+			cout << "Having adding " << bac_sol.size() << " points into the bacteria solution set!" << endl;
 		cal_dp_means_dis(x, bac_sol_point, dis, assign, distance);
 	}
 	for (int i = 0; i < N; i++)
@@ -113,7 +113,7 @@ void SVA_model::compute_coreset() {
 		s[i] += 2 * alpha * N * dis_square_sum[bac_sol_assign[i]] / (num_point[bac_sol_assign[i]] * Loss);
 		s[i] += 4 * N / num_point[bac_sol_assign[i]];
 	}
-	int coreset_point_num = min(int(2 * dim * bac_sol.size() * bac_sol.size() * bac_sol.size() * log(bac_sol.size()) / (coreset_epsilon * coreset_epsilon)), N / 10);
+	int coreset_point_num = min(2 * dim * bac_sol.size() * bac_sol.size() * bac_sol.size() * log(bac_sol.size()) / (coreset_epsilon * coreset_epsilon), N / 10.0);
 	
 	double sum_s = 0;
 	for (int i = 0; i < N; i++)

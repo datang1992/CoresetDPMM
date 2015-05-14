@@ -7,16 +7,16 @@
 using namespace std;
 
 int main () {
-	int N = 100;
+	int N = 10000;
 	double K = 1;
 	int dim = 2;
 	double C = 1, l = 1, S = 1, nu = 1, nu2 = 1;
 	double lambda = 1;
 	double SVM_learning_rate = 0.2;
-	double SVM_iterations = 100;
+	double SVM_iterations = 1000;
 	double coreset_epsilon = 1e-3;
 	int initial_cluster_number = 10;
-	int number_of_iterations = 100;
+	int number_of_iterations = 1000;
 	SVA_model model(K, N, dim, C, l, S, nu, nu2, lambda, SVM_learning_rate, SVM_iterations, coreset_epsilon, initial_cluster_number, number_of_iterations);
 	for (int i = 0; i < N; i++) {
 		Vector2d v;
@@ -32,7 +32,8 @@ int main () {
 	model.find_bacteria_solution();
 	cout << "Finish finding bacteria solution!" << endl;
 	model.compute_coreset();
-	cout << "Finish computing the coreset!" << endl;
+	cout << "Finish computing the coreset! Coreset size: " << model.coreset.size() << endl;
+	cout << endl;
 	model.M2DPM();
 	cout << "Finish the M2DPM algorithm!" << endl;
 	model.compute_assignment();
