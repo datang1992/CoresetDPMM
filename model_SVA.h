@@ -46,6 +46,9 @@ class SVA_model {
 		gsl_rng *rng;
 
 		vector<double> predicted_y;
+		double coreset_acc2;
+		
+		const double omega_min;
 
 		static const double PI = 3.14159265358979323846264338327950288;
 		static const double epsilon = 1e-6;
@@ -65,8 +68,9 @@ class SVA_model {
 		void compute_assignment();
 		double cross_validation(int);
 		double validation();
-		
-		SVA_model(double, int, int, double, double, double, double, double, double, double, int, double, int, int);
+		double coreset_acc();
+
+		SVA_model(double, int, int, double, double, double, double, double, double, double, int, double, int, int, double);
 		~SVA_model();
 };
 

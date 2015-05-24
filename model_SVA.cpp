@@ -9,7 +9,7 @@
 using namespace std;
 using namespace Eigen;
 
-SVA_model::SVA_model(double K, int N, int dim, double C, double l, double S, double nu, double nu2, double lambda, double SVM_learning_rate, int SVM_iterations, double coreset_epsilon, int initial_cluster_number, int number_of_iterations): K(K), N(N), dim(dim), C(C), l(l), S(S), nu(nu), nu2(nu2),  lambda(lambda), SVM_learning_rate(SVM_learning_rate), SVM_iterations(SVM_iterations), coreset_epsilon(coreset_epsilon), initial_cluster_number(initial_cluster_number), number_of_iterations(number_of_iterations) {
+SVA_model::SVA_model(double K, int N, int dim, double C, double l, double S, double nu, double nu2, double lambda, double SVM_learning_rate, int SVM_iterations, double coreset_epsilon, int initial_cluster_number, int number_of_iterations, double omega_min): K(K), N(N), dim(dim), C(C), l(l), S(S), nu(nu), nu2(nu2),  lambda(lambda), SVM_learning_rate(SVM_learning_rate), SVM_iterations(SVM_iterations), coreset_epsilon(coreset_epsilon), initial_cluster_number(initial_cluster_number), number_of_iterations(number_of_iterations), omega_min(omega_min) {
 	rng = gsl_rng_alloc(gsl_rng_rand48);
 	long seed = clock();
 	gsl_rng_set(rng, seed);
@@ -223,8 +223,8 @@ void SVA_model::M2DPM() {
 			weight_sum[i] = 0;
 		}
 		for (int i = 0; i < n; i++) {
-			weighted_sum_x[assign[i]] += coreset_weight[i] * x[coreset[i]];
-			weight_sum[assign[i]] += coreset_weight[i];
+			weighted_sum_x[assign[i]] += x[coreset[i]];//coreset_weight[i] * x[coreset[i]];
+			weight_sum[assign[i]] += 1;//coreset_weight[i];
 		}
 		for (int i = 0; (unsigned int) i < eta.size(); i++) {
 			if (fabs(weight_sum[i]) > epsilon)
@@ -236,9 +236,13 @@ void SVA_model::M2DPM() {
 		}	
 		
 		// Update omega
-		for (int i = 0; i < n; i++)
-			omega[i] = C * hinge_plus(l - y[coreset[i]] * eta[assign[i]].dot(x[coreset[i]]));
-		
+		for (int i = 0; i < n; i++) {
+			omega[i] = max(C * fabs(l - y[coreset[i]] * eta[assign[i]].dot(x[coreset[i]])), omega_min);
+			//if (omega[i] == 0)
+			//	cout << i << '\t' << coreset[i] << '\t' << l - y[coreset[i]] * eta[assign[i]].dot(x[coreset[i]]) << endl;
+		}
+		//while(1);
+
 		// Update eta
 		MatrixXd *Lambda = new MatrixXd[eta.size()];
 		for (int i = 0; (unsigned int) i < mu.size(); i++)
@@ -254,8 +258,14 @@ void SVA_model::M2DPM() {
 			eta[i] = Lambda[i].inverse() * Lambda2[i];
 		delete[] Lambda;
 		delete[] Lambda2;
+		if (iter && (iter % 100 == 0))
+			cout << "Iteration " << iter << " finish!" << endl;
 	}
-	
+	coreset_acc2 = 0;
+	for (int i = 0; i < n; i++)
+		if (eta[assign[i]].dot(x[coreset[i]]) * y[coreset[i]] > 0)
+			coreset_acc2 += 1.0 / n;
+
 	gsl_ran_discrete_free(grd);
 	delete[] prob;
 	delete[] assign;
@@ -273,7 +283,8 @@ void SVA_model::compute_assignment() {
 		double min_loss = 1e100;
 		z.push_back(0);
 		for (int j = 0; (unsigned int) j < mu.size(); j++)
-			if (2 * C * hinge_plus(l - y[i] * eta[j].dot(x[i])) + S * (x[i] - mu[j]).dot(x[i] - mu[j]) < min_loss) {
+			if (eta[j].dot(eta[j]) >= omega_min * omega_min)
+				if (2 * C * hinge_plus(l - y[i] * eta[j].dot(x[i])) + S * (x[i] - mu[j]).dot(x[i] - mu[j]) < min_loss) {
 				min_loss = 2 * C * hinge_plus(l - y[i] * eta[j].dot(x[i])) + S * (x[i] - mu[j]).dot(x[i] - mu[j]);
 				z[i] = j;
 			}
@@ -293,5 +304,13 @@ double SVA_model::validation() {
 	for (int i = 0; i < N; i++)
 		if (y[i] * predicted_y[i] > 0)
 			acc += 1.0 / N;
+	return acc;
+}
+
+double SVA_model::coreset_acc() {
+	double acc = 0;
+	for (int i = 0; (unsigned int) i < coreset.size(); i++)
+		if (y[coreset[i]] * predicted_y[coreset[i]] > 0)
+			acc += 1.0 / coreset.size();
 	return acc;
 }
