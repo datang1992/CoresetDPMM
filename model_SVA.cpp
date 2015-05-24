@@ -265,6 +265,15 @@ void SVA_model::M2DPM() {
 	for (int i = 0; i < n; i++)
 		if (eta[assign[i]].dot(x[coreset[i]]) * y[coreset[i]] > 0)
 			coreset_acc2 += 1.0 / n;
+	coreset_used_clusters = 0;
+	int *assign_num = new int[mu.size()];
+	for (int i = 0; (unsigned int) i < eta.size(); i++)
+		assign_num[i] = 0;
+	for (int i = 0; i < n; i++)
+		assign_num[assign[i]]++;
+	for (int i = 0; (unsigned int) i < mu.size(); i++)
+		if (assign_num[i] > 0)
+			coreset_used_clusters++;
 
 	gsl_ran_discrete_free(grd);
 	delete[] prob;

@@ -47,7 +47,8 @@ class SVA_model {
 
 		vector<double> predicted_y;
 		double coreset_acc2;
-		
+		int coreset_used_clusters;
+
 		const double omega_min;
 
 		static const double PI = 3.14159265358979323846264338327950288;

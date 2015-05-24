@@ -17,7 +17,7 @@ int main () {
 	double coreset_epsilon = 1e-2;
 	double omega_min = 1e-3;
 	int initial_cluster_number = 10;
-	int number_of_iterations = 100;
+	int number_of_iterations = 10000;
 	SVA_model model(K, N, dim, C, l, S, nu, nu2, lambda, SVM_learning_rate, SVM_iterations, coreset_epsilon, initial_cluster_number, number_of_iterations, omega_min);
 	for (int i = 0; i < N; i++) {
 		Vector2d v;
@@ -52,6 +52,7 @@ int main () {
 			used_clusters++;
 		}
 	cout << "Used clusters: " << used_clusters << endl;
+	cout << "Coreset used clusters: " << model.coreset_used_clusters << endl;
 	delete[] coreset_size;
 	return 0;
 }
