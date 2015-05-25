@@ -5,11 +5,12 @@
 #include <time.h>
 #include <map>
 #include <iostream>
+#include <iomanip>
 
 using namespace std;
 using namespace Eigen;
 
-SVA_model::SVA_model(double K, int N, int dim, double C, double l, double S, double nu, double nu2, double lambda, double SVM_learning_rate, int SVM_iterations, double coreset_epsilon, int initial_cluster_number, int number_of_iterations, double omega_min): K(K), N(N), dim(dim), C(C), l(l), S(S), nu(nu), nu2(nu2),  lambda(lambda), SVM_learning_rate(SVM_learning_rate), SVM_iterations(SVM_iterations), coreset_epsilon(coreset_epsilon), initial_cluster_number(initial_cluster_number), number_of_iterations(number_of_iterations), omega_min(omega_min) {
+SVA_model::SVA_model(double K, int N, int dim, double C, double l, double S, double nu, double nu2, double lambda, double SVM_learning_rate, int SVM_iterations, double coreset_epsilon, int initial_cluster_number, int number_of_iterations, double omega_min, int weight_type): K(K), N(N), dim(dim), C(C), l(l), S(S), nu(nu), nu2(nu2),  lambda(lambda), SVM_learning_rate(SVM_learning_rate), SVM_iterations(SVM_iterations), coreset_epsilon(coreset_epsilon), initial_cluster_number(initial_cluster_number), number_of_iterations(number_of_iterations), omega_min(omega_min), weight_type(weight_type) {
 	rng = gsl_rng_alloc(gsl_rng_rand48);
 	long seed = clock();
 	gsl_rng_set(rng, seed);
@@ -98,20 +99,33 @@ void SVA_model::compute_coreset() {
 		if (y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]) > l)
 			dis_square_sum[bac_sol_assign[i]] += C * (y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]) - l);
 	}
-	double Loss = lambda * K;
+	double Loss = lambda * K, eta_square_sum = 0;
 	for (int i = 0; (unsigned int) i < bac_sol.size(); i++)
-		Loss += bac_sol_classifier[i].dot(bac_sol_classifier[i]) / (2 * nu * nu);
+		eta_square_sum += bac_sol_classifier[i].dot(bac_sol_classifier[i]) / (2 * nu * nu);
+	Loss += eta_square_sum;
 	for (int i = 0; i < N; i++)
 		if (l - y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]) > 0)
 			Loss += 2 * C * (l - y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]));
 	for (int i = 0; i < N; i++)
 		Loss += S * (x[i] - x[bac_sol[bac_sol_assign[i]]]).dot(x[i] - x[bac_sol[bac_sol_assign[i]]]);
-	for (int i = 0; i < N; i++) {
-		s[i] = 1 + 2 * alpha * N * S * (x[i] - x[bac_sol[bac_sol_assign[i]]]).dot(x[i] - x[bac_sol[bac_sol_assign[i]]]) / Loss;
-		if (l - y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]) > 0)
-			s[i] += 2 * alpha * N * C * (l - y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i])) / Loss;
-		s[i] += 2 * alpha * N * dis_square_sum[bac_sol_assign[i]] / (num_point[bac_sol_assign[i]] * Loss);
-		s[i] += 4 * N / num_point[bac_sol_assign[i]];
+	
+	switch (weight_type){
+		case 1:
+		//	Coreset Weight 1
+		for (int i = 0; i < N; i++)
+			s[i] = (eta_square_sum + 2 * N * C * hinge_plus(1 - y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i])) + N * S * (x[i] - x[bac_sol[bac_sol_assign[i]]]).dot(x[i] - x[bac_sol[bac_sol_assign[i]]]) + lambda * K) / Loss;
+		break;
+		
+		case 3:
+		//	Coreset Weight 3
+		for (int i = 0; i < N; i++) {
+			s[i] = 1 + 2 * alpha * N * S * (x[i] - x[bac_sol[bac_sol_assign[i]]]).dot(x[i] - x[bac_sol[bac_sol_assign[i]]]) / Loss;
+			if (l - y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i]) > 0)
+				s[i] += 2 * alpha * N * C * (l - y[i] * bac_sol_classifier[bac_sol_assign[i]].dot(x[i])) / Loss;
+			s[i] += 2 * alpha * N * dis_square_sum[bac_sol_assign[i]] / (num_point[bac_sol_assign[i]] * Loss);
+			s[i] += 4 * N / num_point[bac_sol_assign[i]];
+		}
+		break;
 	}
 	int coreset_point_num = min(2 * dim * bac_sol.size() * bac_sol.size() * bac_sol.size() * log(bac_sol.size()) / (coreset_epsilon * coreset_epsilon), N / 10.0);
 	
@@ -134,8 +148,10 @@ void SVA_model::compute_coreset() {
 	}
 
 	for (map<int, double>::iterator iter = point_weight.begin(); iter != point_weight.end(); iter++) {
-		coreset.push_back(iter -> first);
-		coreset_weight.push_back(iter -> second);
+		for (int i = 0; i < (iter -> second) / 3; i++) {
+			coreset.push_back(iter -> first);
+			coreset_weight.push_back(1);
+		}
 	}
 
 	gsl_ran_discrete_free(grd);
@@ -272,9 +288,11 @@ void SVA_model::M2DPM() {
 	for (int i = 0; i < n; i++)
 		assign_num[assign[i]]++;
 	for (int i = 0; (unsigned int) i < mu.size(); i++)
-		if (assign_num[i] > 0)
+		if (assign_num[i] > 0) {
+			cout << i << '\t' << setiosflags(ios::fixed) << setprecision(2) << 100.0 * assign_num[i] / n<< "%\t" << setiosflags(ios::fixed) << setprecision(6) << eta[i](0) << '\t' << eta[i](1) << '\t' << mu[i](0) << '\t' << mu[i](1) << endl;
 			coreset_used_clusters++;
-
+		}
+	cout <<"Coreset used clusters: " << coreset_used_clusters << endl;
 	gsl_ran_discrete_free(grd);
 	delete[] prob;
 	delete[] assign;

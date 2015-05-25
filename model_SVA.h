@@ -50,6 +50,7 @@ class SVA_model {
 		int coreset_used_clusters;
 
 		const double omega_min;
+		const int weight_type;
 
 		static const double PI = 3.14159265358979323846264338327950288;
 		static const double epsilon = 1e-6;
@@ -71,7 +72,7 @@ class SVA_model {
 		double validation();
 		double coreset_acc();
 
-		SVA_model(double, int, int, double, double, double, double, double, double, double, int, double, int, int, double);
+		SVA_model(double, int, int, double, double, double, double, double, double, double, int, double, int, int, double, int);
 		~SVA_model();
 };
 
